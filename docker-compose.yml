@@ -1,0 +1,34 @@
+version: '3'
+services:
+
+  db:
+    image: postgres:11-alpine
+    environment:
+      PGDATA: /var/lib/postgresql/data/pgdata
+      POSTGRES_PASSWORD: password
+      POSTGRES_USER: user
+    ports:
+      - '5432:5432'
+    volumes:
+      - ../volumes/db:/var/lib/postgresql/data/pgdata
+    restart: always
+
+
+  db-admin:
+    image: sosedoff/pgweb
+    depends_on:
+      - db
+    environment:
+      DATABASE_URL: postgres://user:password@db:5432/video-annotations-api_development?sslmode=disable
+    ports:
+      - '8081:8081'
+    restart: on-failure:10
+
+  redis:
+    image: redis:5-alpine
+    ports:
+      - "6379:6379"
+    volumes:
+      - ../volumes/redis:/data
+    restart: always
+
